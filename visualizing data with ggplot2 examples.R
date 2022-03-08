@@ -244,3 +244,10 @@ scatter_plot
 
 
 
+# Make a multiple graph figure --------------------------------------------
+
+#load ggpubr with useful functions for arranging figures
+library(ggpubr)
+
+#make multi panel figure
+ggarrange(simple_bar, scatter_plot, nrow = 1, labels = "AUTO")
