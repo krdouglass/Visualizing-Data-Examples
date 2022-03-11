@@ -50,8 +50,8 @@ data$Percent_Grade <- as.numeric(data$Percent_Grade)
 data$Sex <- as.factor(data$Sex)
 
 #change character to category (i.e. factor) with ordered levels
-data$Letter_Grade <- factor(data$Letter_Grade,
-                            levels = c("A", "B", "C", "D", "F")
+data$Letter_Grade <- ordered(data$Letter_Grade,
+                            levels = c("A", "B", "C", "D", "F"),
                             )
 
 
@@ -110,7 +110,7 @@ simple_bar <- ggplot(sex_summary,
                 colour="black", 
                 alpha=0.9, 
                 size=1.3
-                ) +
+                ) 
 
 simple_bar
 
@@ -132,6 +132,82 @@ simple_bar + theme_light()
 
 simple_bar + theme_dark()
 
+# reorder categories on axis ----------------------------------------------
+
+# to create a specific order, order the factor the bars are based on
+# reorder the factors
+data1 <- data # make a new dta set where Sex is ordered
+data1$Sex <- ordered(data1$Sex, # ordering sex
+                    levels = c("M", "F")
+                    )
+
+# summarize sex data we want in the graph
+ordered_sex_summary <- data1 %>%
+  group_by(Sex) %>%
+  summarize(average_grade = mean(Percent_Grade),
+            sd_grade = sd(Percent_Grade)
+  )
+
+#plot
+ordered_simple_bar <- ggplot(ordered_sex_summary, 
+                     aes(x=Sex, 
+                         y=average_grade, 
+                         fill = Sex
+                     )
+) +
+  geom_bar(stat="identity") +
+  xlab("Student Sex") +
+  ylab ("Grade (%)") +
+  geom_errorbar(aes(ymin=average_grade-sd_grade, 
+                    ymax=average_grade+sd_grade), 
+                width=0.4, 
+                colour="black", 
+                alpha=0.9, 
+                size=1.3
+  ) 
+
+ordered_simple_bar
+
+
+# customize colors --------------------------------------------------------
+
+# change outlines and fill
+white_simple_bar <- ggplot(sex_summary, 
+                     aes(x=Sex, 
+                         y=average_grade
+                         
+                     )
+) +
+  geom_bar(stat="identity",
+           color = "black",# outline color
+           fill = "white",# bar color
+           ) +
+  xlab("Student Sex") +
+  ylab ("Grade (%)") +
+  geom_errorbar(aes(ymin=average_grade-sd_grade, 
+                    ymax=average_grade+sd_grade), 
+                width=0.4, 
+                colour="black", 
+                alpha=0.9, 
+                size=1.3
+  ) 
+
+white_simple_bar
+
+# using color palettes from RColorBrewer package
+# https://www.r-graph-gallery.com/38-rcolorbrewers-palettes.html
+simple_bar + scale_fill_brewer(palette="Dark2")
+
+# some options for grey scaled palettes
+simple_bar + theme_classic() + scale_fill_brewer(palette="Greys")
+
+simple_bar + scale_fill_grey()
+
+# custom pick colors
+# there are lots of helpful websites for finding hex codes for colors
+# http://www.stat.columbia.edu/~tzheng/files/Rcolor.pdf
+# https://htmlcolorcodes.com/
+simple_bar + scale_fill_manual(values=c("#999999", "#E69F00"))
 
 # alter axis --------------------------------------------------------------
 
@@ -144,8 +220,18 @@ simple_bar + scale_y_continuous(
 # change labels for discrete axis
 simple_bar + scale_x_discrete(
   breaks = c("M", "F"),# what is this useful for?
-  labels = c("Male", "Female" ) # custom names for bars
+  labels = c("Male", "Female"), # custom names for bars
                               )
+
+# axis labels angle and placement
+simple_bar + theme(axis.text.x = element_text(
+  angle = 90, #angle
+  vjust = 2, # vertical placement
+  hjust=2 # horizontal placement
+                                              )
+                  )
+
+
 #change axis line
 simple_bar + theme(axis.line.y = element_line(color="blue"))
 
@@ -161,9 +247,10 @@ simple_bar + theme(
                         t = 20, #space above text before graph
                         b = 20 #space to bottom edge of figure
                                       ),                              
-                        hjust=0.8, #horizontal justification
-                        vjust=0.8, #vertal justification
-                                   )
+                      hjust=0.8, #horizontal justification
+                      vjust=0.8, #vertical justification
+                      angle = 45 #make at an angle    
+                                  )
                     )
 
 # graph title -------------------------------------------------------------
@@ -200,6 +287,7 @@ simple_bar + theme(legend.text=element_text(
                                            )
                   )
 
+
 # clustered bar graph -----------------------------------------------------
 
 # summarize birth year and sex data we want in the graph
@@ -230,7 +318,8 @@ cluster_bar <- ggplot(age_sex_summary,
                 colour="black", #color
                 alpha=1, #transparency
                 size=0.8 #line thickness
-  ) 
+  ) +
+  scale_fill_brewer(palette = "Set1")
 cluster_bar
 
 
@@ -252,7 +341,8 @@ stacked_bar <- ggplot(class_sex_summary,
            position = "stack" # stack bars on each other
   ) +
   xlab("Class") +
-  ylab ("Number of Students")
+  ylab ("Number of Students")+
+  scale_fill_brewer(palette = "Pastel1")
 
 stacked_bar
 
@@ -284,6 +374,7 @@ facet_bar <- ggplot(class_age_sex_summary,
                 alpha=0.9,
                 size=1.3
   ) +
+  scale_fill_brewer(palette = "Pastel1") +
   facet_wrap(class_age_sex_summary$Class) # here we designate the variable 
 # by which to make the multiple graphs
 
@@ -294,18 +385,57 @@ facet_bar
 #make scatter plot
 scatter_plot <- ggplot(age_sex_summary, #source the data
             aes(x=Age, # variable on x axis
-                y=average_grade # variable on y axis
-            )
+                y=average_grade, # variable on y axis
+                )
 ) +
   geom_point() + # scatter plot
   xlab("Age (years)") + # x axis label
   ylab ("Grade (%)") + # y axis label
-  ggtitle("Relationship Between Grades and Age") + # add title
-  geom_smooth(method=lm) + # add trend line with 95% confidence interval
+  geom_smooth(method=lm, # add trend line with 95% confidence interval
+              color = "black" # make the line black
+              ) + 
   theme_minimal() # used minimal theme
 
 scatter_plot
 
+
+#make scatter plot without confidence interval
+scatter_plot <- ggplot(age_sex_summary, #source the data
+                       aes(x=Age, # variable on x axis
+                           y=average_grade, # variable on y axis
+                       )
+) +
+  geom_point() + # scatter plot
+  xlab("Age (years)") + # x axis label
+  ylab ("Grade (%)") + # y axis label
+  geom_smooth(method=lm, # add trend line with 95% confidence interval
+              color = "black", # make the line black
+              se = FALSE # remove confidence interval
+              ) + 
+  theme_minimal() # used minimal theme
+
+scatter_plot
+
+#make scatter plot with color by variable
+scatter_plot <- ggplot(age_sex_summary, #source the data
+                       aes(x=Age, # variable on x axis
+                           y=average_grade, # variable on y axis
+                           shape = Sex
+                           )
+                      ) +
+  geom_point() + # scatter plot
+  xlab("Age (years)") + # x axis label
+  ylab ("Grade (%)") + # y axis label
+  geom_smooth(aes(group=Sex, # add trend line with 95% confidence interval
+                  fill = Sex # color interval
+                  ), 
+              method="lm", # trend line formula
+              color = "black", #color of lines
+              size=1) + # size of lines
+  theme_minimal() + # used minimal theme
+  scale_fill_brewer(palette = "Pastel1")
+
+scatter_plot
 
 # box plot ----------------------------------------------------------------
 
