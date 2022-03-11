@@ -307,6 +307,32 @@ scatter_plot <- ggplot(age_sex_summary, #source the data
 scatter_plot
 
 
+# box plot ----------------------------------------------------------------
+
+#Load package with a bigger data set for the box plot examples
+library(gapminder)
+
+#look at the start of the data
+head(gapminder)
+
+#summaraize population of the continents
+gapminder_summary <- gapminder %>%
+  group_by(continent, pop) %>%
+  summarize(avg_pop = mean(pop/1000000),
+            sd_pop = sd(pop/1000000)
+  )
+
+#make a box plot
+boxplot <- ggplot(gapminder_summary, #data
+                  aes(x=continent, #x variable
+                      y=avg_pop #y variable
+                      )
+) +
+  geom_boxplot() + #box plot
+  ylab("Average Country Populaiton (millions)")+
+  xlab("Continent")
+
+boxplot
 
 # Make a multiple graph figure --------------------------------------------
 
