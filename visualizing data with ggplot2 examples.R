@@ -334,6 +334,42 @@ boxplot <- ggplot(gapminder_summary, #data
 
 boxplot
 
+
+# model coefficients graph ------------------------------------------------
+
+#prep some data with 95% confidence interval
+sex_summary <- sex_summary %>%
+  mutate(lower = average_grade - 1.96 * sd_grade,
+         upper = average_grade + 1.96 * sd_grade
+         )
+
+Coefficent_plot <- ggplot(sex_summary, #source the data
+                       aes(x=average_grade, # variable on x axis
+                           y=Sex, # variable on y axis
+                           color=Sex
+                       )
+) +
+  geom_point() + # point plot
+  ylab(" ") + # y axis label
+  xlab ("Grade (%)") + # x axis label
+  scale_y_discrete(
+    breaks = c("M", "F"),# what is this useful for?
+    labels = c("Male", "Female" ) # custom names for bars
+  ) +
+  geom_pointrange( # add point with 95% Confidence Interval
+    aes(xmin=lower, 
+        xmax=upper
+        ), 
+    size = 1
+                  ) +
+  geom_vline(aes(xintercept = 70), # add y-axis where you want 
+             linetype="dotted" ,   # like for a passing grade
+             size = 1.2 #line thickness
+             ) 
+
+
+Coefficent_plot
+
 # Make a multiple graph figure --------------------------------------------
 
 #load ggpubr with useful functions for arranging figures
