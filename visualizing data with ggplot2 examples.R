@@ -61,7 +61,8 @@ data$Letter_Grade <- factor(data$Letter_Grade,
 sex_summary <- data %>%
   group_by(Sex) %>%
   summarize(average_grade = mean(Percent_Grade),
-            sd_grade = sd(Percent_Grade)
+            sd_grade = sd(Percent_Grade),
+            Quantity = n()
             )
 
 
@@ -110,7 +111,7 @@ simple_bar <- ggplot(sex_summary,
                 colour="black", 
                 alpha=0.9, 
                 size=1.3
-                ) +
+                ) 
 
 simple_bar
 
@@ -200,6 +201,14 @@ simple_bar + theme(legend.text=element_text(
                                            )
                   )
 
+#  display n on bars ------------------------------------------------------
+
+simple_bar + geom_text(aes(label = Quantity), # n data
+                       size = 5, # text size
+                       hjust = 0.5, #horizontal placement
+                       vjust = 12 #vertical placement
+                       ) 
+  
 # clustered bar graph -----------------------------------------------------
 
 # summarize birth year and sex data we want in the graph
