@@ -68,17 +68,13 @@ sex_summary <- data %>%
 # build a bar graph step by step
 # to learn what each part does
 # a simple bar graph of grade for each sex
-p <- ggplot(sex_summary, 
-            aes(x=Sex, 
-                y=average_grade, 
-                fill = Sex
+p <- ggplot(sex_summary, #data
+            aes(x=Sex, #x variable
+                y=average_grade, #y variable
+                fill = Sex #color by sex
                 )
             ) +
-  geom_bar(stat="identity") 
-p
-
-p <- ggplot(sex_summary, aes(x=Sex, y=average_grade)) +
-  geom_bar(stat="identity") 
+  geom_bar(stat="identity") #bar graph
 p
 
 p <- p + xlab("Student Sex")
@@ -90,13 +86,11 @@ p
 p <- p + geom_errorbar( aes(x=Sex, 
                      ymin=average_grade-sd_grade, 
                      ymax=average_grade+sd_grade), 
-                width=0.4, 
-                colour="black", 
-                alpha=0.9, 
-                size=1.3
+                width=0.4, #width of T
+                colour="black", #color
+                alpha=0.9, #transparency
+                size=1.3 #thickness
                 )
-p
-p <- p + scale_y_continuous(breaks = seq(0, 100, by = 10))
 p
 
 
@@ -117,94 +111,9 @@ simple_bar <- ggplot(sex_summary,
                 alpha=0.9, 
                 size=1.3
                 ) +
-  scale_y_continuous(breaks = seq(0, 100, by = 10))
 
 simple_bar
 
-
-# clustered bar graph -----------------------------------------------------
-
-# summarize birth year and sex data we want in the graph
-age_sex_summary <- data %>%
-  group_by(Year, Sex) %>%
-  summarize(average_grade = mean(Percent_Grade),
-            sd_grade = sd(Percent_Grade)
-            ) %>%
-  mutate(Age = 2022-Year)
-
-# put the code all together
-cluster_bar <- ggplot(age_sex_summary, 
-                      aes(x=as.factor(Age), 
-                        y=average_grade, 
-                        fill = Sex
-                        )
-                      ) +
-  geom_bar(stat="identity", position = "dodge") +
-  xlab("Student Age (years)") +
-  ylab ("Grade (%)") +
-  geom_errorbar(aes(ymin=average_grade-sd_grade,
-                     ymax=average_grade+sd_grade),
-                position=position_dodge(.9),
-                width=0.4,
-                colour="black",
-                alpha=0.9,
-                size=1.3
-                ) 
-cluster_bar
-
-
-# stacked bar graph -------------------------------------------------------
-
-# summarize data to use
-class_sex_summary <- data %>%
-  group_by(Class, Sex) %>%
-  summarize(Quantity = n())
-
-# make stacked bar graph
-stacked_bar <- ggplot(class_sex_summary, 
-                      aes(x=as.factor(Class), 
-                          y=Quantity,
-                          fill = Sex
-                          )
-                      ) +
-  geom_bar(stat="identity", position = "stack") +
-  xlab("Class") +
-  ylab ("Number of Students")
-  
-stacked_bar
-
-
-# facet wrap --------------------------------------------------------------
-# summarize each class' sex data we want in the graph
-class_age_sex_summary <- data %>%
-  group_by(Class, Sex) %>%
-  summarize(average_grade = mean(Percent_Grade),
-            sd_grade = sd(Percent_Grade)
-  )
-
-# face wrap will separates data into 
-# multiple graphs based on a designated variable
-facet_bar <- ggplot(class_age_sex_summary, 
-                    aes(x=as.factor(Sex), 
-                        y=average_grade, 
-                        fill = Sex
-                        )
-                    ) +
-  geom_bar(stat="identity", position = "dodge") +
-  xlab("Class") +
-  ylab ("Grade (%)") +
-  geom_errorbar(aes(ymin=average_grade-sd_grade,
-                     ymax=average_grade+sd_grade),
-                 position=position_dodge(.9),
-                 width=0.4,
-                 colour="black",
-                 alpha=0.9,
-                 size=1.3
-                ) +
-  facet_wrap(class_age_sex_summary$Class) # here we designate the variable 
-                                          # by which to make the multiple graphs
-
-facet_bar
 
 
 # ggplot themes -----------------------------------------------------------
@@ -224,6 +133,161 @@ simple_bar + theme_light()
 simple_bar + theme_dark()
 
 
+# alter axis --------------------------------------------------------------
+
+# change scale and/or ticks for a continuous axis
+simple_bar + scale_y_continuous(
+  breaks = seq(0, 100,10), #ticks 0 to 100 every 10
+  limits = c(0,100) #bottom and top of axis
+                                ) 
+
+# change labels for discrete axis
+simple_bar + scale_x_discrete(
+  breaks = c("M", "F"),# what is this useful for?
+  labels = c("Male", "Female" ) # custom names for bars
+                              )
+#change axis line
+simple_bar + theme(axis.line.y = element_line(color="blue"))
+
+# change length of axis tick marks
+simple_bar + theme(axis.ticks.length = unit(1, "cm")) 
+
+#adjust axis text
+simple_bar + theme(
+       axis.title.x = element_text(
+                      size=12, # font size
+                      face="bold", #bold, italics, etc.
+                      margin = margin(
+                        t = 20, #space above text before graph
+                        b = 20 #space to bottom edge of figure
+                                      ),                              
+                        hjust=0.8, #horizontal justification
+                        vjust=0.8, #vertal justification
+                                   )
+                    )
+
+# graph title -------------------------------------------------------------
+
+
+
+# Add title
+simple_bar + ggtitle("Title") +
+  theme(plot.title = element_text(
+                      size=15, 
+                      face="bold",
+                      margin = margin(t = 20, #space above text edge of figure 
+                                      b = 20 #space to bottom before graph
+                      ),                              
+                      hjust=0.8, #horizontal justification
+                      vjust=0.8, #vertal justification
+                                  )
+        )
+
+  
+
+# alter legend ------------------------------------------------------------
+
+simple_bar +  theme(legend.position = "none") #remove legend
+simple_bar +  theme(legend.position = "right") #position right of graph
+simple_bar +  theme(legend.position = "left") #position left of graph
+simple_bar +  theme(legend.position = "bottom") #position below graph
+simple_bar +  theme(legend.position = c(0.8, 0.8)) #custom position
+
+simple_bar + theme(legend.text=element_text(
+                      color= "blue", #text color
+                      size=12, # text size
+                      face = "bold.italic" #bold, italics etc.
+                                           )
+                  )
+
+# clustered bar graph -----------------------------------------------------
+
+# summarize birth year and sex data we want in the graph
+age_sex_summary <- data %>%
+  group_by(Year, Sex) %>%
+  summarize(average_grade = mean(Percent_Grade),
+            sd_grade = sd(Percent_Grade)
+  ) %>%
+  mutate(Age = 2022-Year)
+
+# put the code all together
+cluster_bar <- ggplot(age_sex_summary, 
+                      aes(x=as.factor(Age), 
+                          y=average_grade, 
+                          fill = Sex
+                      )
+) +
+  geom_bar(stat="identity", 
+           position = "dodge", #put bars next to each other
+           width = 0.8 #bar width
+  ) +
+  xlab("Student Age (years)") +
+  ylab ("Grade (%)") +
+  geom_errorbar(aes(ymin=average_grade-sd_grade,
+                    ymax=average_grade+sd_grade),
+                position=position_dodge(0.8),
+                width=0.5, # width of T
+                colour="black", #color
+                alpha=1, #transparency
+                size=0.8 #line thickness
+  ) 
+cluster_bar
+
+
+# stacked bar graph -------------------------------------------------------
+
+# summarize data to use
+class_sex_summary <- data %>%
+  group_by(Class, Sex) %>%
+  summarize(Quantity = n())
+
+# make stacked bar graph
+stacked_bar <- ggplot(class_sex_summary, 
+                      aes(x=as.factor(Class), 
+                          y=Quantity,
+                          fill = Sex
+                      )
+) +
+  geom_bar(stat="identity", 
+           position = "stack" # stack bars on each other
+  ) +
+  xlab("Class") +
+  ylab ("Number of Students")
+
+stacked_bar
+
+
+# facet wrap --------------------------------------------------------------
+# summarize each class' sex data we want in the graph
+class_age_sex_summary <- data %>%
+  group_by(Class, Sex) %>%
+  summarize(average_grade = mean(Percent_Grade),
+            sd_grade = sd(Percent_Grade)
+  )
+
+# face wrap will separates data into 
+# multiple graphs based on a designated variable
+facet_bar <- ggplot(class_age_sex_summary, 
+                    aes(x=as.factor(Sex), 
+                        y=average_grade, 
+                        fill = Sex
+                    )
+) +
+  geom_bar(stat="identity", position = "dodge") +
+  xlab("Class") +
+  ylab ("Grade (%)") +
+  geom_errorbar(aes(ymin=average_grade-sd_grade,
+                    ymax=average_grade+sd_grade),
+                position=position_dodge(.9),
+                width=0.4,
+                colour="black",
+                alpha=0.9,
+                size=1.3
+  ) +
+  facet_wrap(class_age_sex_summary$Class) # here we designate the variable 
+# by which to make the multiple graphs
+
+facet_bar
 
 # scatter plot ------------------------------------------------------------
 
