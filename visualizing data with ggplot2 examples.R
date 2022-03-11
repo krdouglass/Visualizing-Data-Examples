@@ -362,8 +362,8 @@ Coefficent_plot <- ggplot(sex_summary, #source the data
         ), 
     size = 1
                   ) +
-  geom_vline(aes(xintercept = 70), # add y-axis where you want 
-             linetype="dotted" ,   # like for a passing grade
+  geom_vline(aes(xintercept = 70), # add y-axis where you want (passing grade)
+             linetype="dotted" ,   # type of line, solid, dotted, etc.
              size = 1.2 #line thickness
              ) 
 
