@@ -507,3 +507,5 @@ library(ggpubr)
 
 #make multi panel figure
 ggarrange(simple_bar, scatter_plot, nrow = 1, labels = "AUTO")
+
+#
