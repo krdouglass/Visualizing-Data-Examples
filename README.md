@@ -1,4 +1,4 @@
-# visualizing data with ggplot2 examples
+# Visualizing Data with ggplot2 Examples
 The purpose of the R scripts in this repository is to demonstrate packages and functions 
 I often use when visualizing data. These were made mostly for my own reference 
 and as a way to practice, so it is far from perfect or comprehensive, but I will share 
